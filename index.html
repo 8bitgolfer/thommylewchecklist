@@ -1,0 +1,462 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Whatnot Stream Checklist</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: Arial, Helvetica, sans-serif;
+    }
+
+    body {
+      background: #07111f;
+      color: #ffffff;
+      min-height: 100vh;
+      padding: 24px;
+    }
+
+    .container {
+      max-width: 1100px;
+      margin: 0 auto;
+    }
+
+    header {
+      background: linear-gradient(135deg, #00bcd4, #0f172a);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      border-radius: 22px;
+      padding: 28px;
+      margin-bottom: 22px;
+      box-shadow: 0 20px 45px rgba(0, 0, 0, 0.35);
+    }
+
+    header h1 {
+      font-size: clamp(2rem, 4vw, 4rem);
+      margin-bottom: 10px;
+      letter-spacing: -1px;
+    }
+
+    header p {
+      color: #e6faff;
+      font-size: 1.05rem;
+      max-width: 760px;
+      line-height: 1.5;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: 1.1fr 0.9fr;
+      gap: 20px;
+    }
+
+    .card {
+      background: rgba(255, 255, 255, 0.075);
+      border: 1px solid rgba(255, 255, 255, 0.13);
+      border-radius: 20px;
+      padding: 22px;
+      box-shadow: 0 18px 35px rgba(0, 0, 0, 0.28);
+      backdrop-filter: blur(10px);
+    }
+
+    .card h2 {
+      font-size: 1.45rem;
+      margin-bottom: 14px;
+      color: #7defff;
+    }
+
+    .checklist-section {
+      margin-bottom: 22px;
+    }
+
+    .checklist-section h3 {
+      color: #ffffff;
+      font-size: 1.05rem;
+      margin-bottom: 10px;
+      border-left: 4px solid #00d9ff;
+      padding-left: 10px;
+    }
+
+    label.check-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 11px;
+      padding: 11px 12px;
+      margin-bottom: 8px;
+      border-radius: 12px;
+      background: rgba(255, 255, 255, 0.06);
+      cursor: pointer;
+      transition: 0.2s ease;
+      line-height: 1.35;
+    }
+
+    label.check-item:hover {
+      background: rgba(0, 217, 255, 0.13);
+    }
+
+    input[type="checkbox"] {
+      width: 19px;
+      height: 19px;
+      accent-color: #00d9ff;
+      margin-top: 1px;
+      flex-shrink: 0;
+    }
+
+    .check-item span.done {
+      text-decoration: line-through;
+      opacity: 0.55;
+    }
+
+    textarea,
+    input,
+    select {
+      width: 100%;
+      border: 1px solid rgba(255, 255, 255, 0.18);
+      border-radius: 12px;
+      background: rgba(0, 0, 0, 0.25);
+      color: #fff;
+      padding: 12px;
+      outline: none;
+      font-size: 0.98rem;
+    }
+
+    textarea {
+      min-height: 220px;
+      resize: vertical;
+      line-height: 1.45;
+    }
+
+    select option {
+      background: #0f172a;
+      color: #fff;
+    }
+
+    .form-row {
+      display: grid;
+      grid-template-columns: 1fr 150px;
+      gap: 10px;
+      margin-bottom: 10px;
+    }
+
+    .buttons {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 12px;
+    }
+
+    button {
+      border: none;
+      border-radius: 999px;
+      padding: 11px 16px;
+      background: #00d9ff;
+      color: #04111f;
+      font-weight: 700;
+      cursor: pointer;
+      transition: 0.2s ease;
+    }
+
+    button:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 8px 20px rgba(0, 217, 255, 0.28);
+    }
+
+    button.secondary {
+      background: rgba(255, 255, 255, 0.12);
+      color: #fff;
+      border: 1px solid rgba(255, 255, 255, 0.16);
+    }
+
+    .ranking-list {
+      margin-top: 16px;
+      display: grid;
+      gap: 10px;
+    }
+
+    .rank-card {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      align-items: center;
+      gap: 12px;
+      background: rgba(255, 255, 255, 0.07);
+      border-radius: 14px;
+      padding: 13px;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .rank-title {
+      font-weight: 700;
+      margin-bottom: 4px;
+    }
+
+    .rank-badge {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-width: 74px;
+      border-radius: 999px;
+      padding: 8px 11px;
+      font-weight: 800;
+      color: #04111f;
+      background: #fff;
+    }
+
+    .rank-s { background: #ffd700; }
+    .rank-a { background: #7dff9b; }
+    .rank-b { background: #7defff; }
+    .rank-c { background: #ffb86b; }
+    .rank-d { background: #ff7d7d; }
+
+    .small {
+      font-size: 0.88rem;
+      color: #b9d8e0;
+      line-height: 1.4;
+      margin-top: 8px;
+    }
+
+    .copy-box {
+      margin-top: 14px;
+    }
+
+    .footer-note {
+      text-align: center;
+      color: #9bb5be;
+      font-size: 0.9rem;
+      margin-top: 22px;
+    }
+
+    @media (max-width: 860px) {
+      body { padding: 14px; }
+      .grid { grid-template-columns: 1fr; }
+      .form-row { grid-template-columns: 1fr; }
+      header { padding: 22px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1>Whatnot Stream Checklist</h1>
+      <p>Use this one-page site as your stream prep board and show notes builder. Check off what is ready, rank items live, then copy the notes into your Whatnot stream description.</p>
+    </header>
+
+    <main class="grid">
+      <section class="card">
+        <h2>Stream Checklist</h2>
+
+        <div class="checklist-section">
+          <h3>Before Going Live</h3>
+          <label class="check-item"><input type="checkbox" data-save="check-1"><span>Charge phone / camera and test stream angle</span></label>
+          <label class="check-item"><input type="checkbox" data-save="check-2"><span>Test mic, lighting, Wi-Fi, and Whatnot app</span></label>
+          <label class="check-item"><input type="checkbox" data-save="check-3"><span>Set stream title, category, tags, and thumbnail</span></label>
+          <label class="check-item"><input type="checkbox" data-save="check-4"><span>Prepare sleeves, top loaders, tape, labels, and packaging</span></label>
+          <label class="check-item"><input type="checkbox" data-save="check-5"><span>Sort inventory by team, player, sport, or price tier</span></label>
+        </div>
+
+        <div class="checklist-section">
+          <h3>Show Notes</h3>
+          <label class="check-item"><input type="checkbox" data-save="check-6"><span>Write the stream rules clearly</span></label>
+          <label class="check-item"><input type="checkbox" data-save="check-7"><span>List chase cards, autos, patches, numbered cards, rookies, and hits</span></label>
+          <label class="check-item"><input type="checkbox" data-save="check-8"><span>Add starting price, spin price, or auction format</span></label>
+          <label class="check-item"><input type="checkbox" data-save="check-9"><span>Add shipping reminder and buyer note</span></label>
+          <label class="check-item"><input type="checkbox" data-save="check-10"><span>Pin key info in chat after going live</span></label>
+        </div>
+
+        <div class="checklist-section">
+          <h3>During Stream</h3>
+          <label class="check-item"><input type="checkbox" data-save="check-11"><span>Welcome buyers and explain the format</span></label>
+          <label class="check-item"><input type="checkbox" data-save="check-12"><span>Show card condition before each auction/spin</span></label>
+          <label class="check-item"><input type="checkbox" data-save="check-13"><span>Keep sold cards organized by buyer</span></label>
+          <label class="check-item"><input type="checkbox" data-save="check-14"><span>Thank buyers and remind them to bookmark/follow</span></label>
+        </div>
+
+        <div class="buttons">
+          <button onclick="resetChecklist()" class="secondary">Reset Checklist</button>
+        </div>
+      </section>
+
+      <section class="card">
+        <h2>Item Ranking System</h2>
+        <p class="small">Add items, choose a ranking group, and build a clean list for your stream notes. Suggested ranks: S = chase/hit, A = strong item, B = solid, C = filler, D = low-end.</p>
+
+        <div class="form-row" style="margin-top: 14px;">
+          <input id="itemName" type="text" placeholder="Example: Drake Maye RC Phoenix Laser" />
+          <select id="itemRank">
+            <option value="S">S Tier</option>
+            <option value="A">A Tier</option>
+            <option value="B">B Tier</option>
+            <option value="C">C Tier</option>
+            <option value="D">D Tier</option>
+          </select>
+        </div>
+
+        <div class="buttons">
+          <button onclick="addItem()">Add Ranked Item</button>
+          <button onclick="clearItems()" class="secondary">Clear Rankings</button>
+        </div>
+
+        <div id="rankingList" class="ranking-list"></div>
+
+        <div class="copy-box">
+          <h2 style="margin-top: 22px;">Whatnot Show Notes</h2>
+          <textarea id="showNotes" placeholder="Write or generate your Whatnot show notes here..."></textarea>
+          <div class="buttons">
+            <button onclick="generateNotes()">Generate Notes From Rankings</button>
+            <button onclick="copyNotes()" class="secondary">Copy Notes</button>
+          </div>
+          <p class="small" id="copyStatus"></p>
+        </div>
+      </section>
+    </main>
+
+    <p class="footer-note">Made for quick Whatnot stream prep. Your checklist and rankings save automatically on this browser.</p>
+  </div>
+
+  <script>
+    const rankingList = document.getElementById('rankingList');
+    const itemName = document.getElementById('itemName');
+    const itemRank = document.getElementById('itemRank');
+    const showNotes = document.getElementById('showNotes');
+    const copyStatus = document.getElementById('copyStatus');
+
+    let rankedItems = JSON.parse(localStorage.getItem('rankedItems')) || [];
+
+    function saveRankings() {
+      localStorage.setItem('rankedItems', JSON.stringify(rankedItems));
+    }
+
+    function renderRankings() {
+      rankingList.innerHTML = '';
+
+      if (rankedItems.length === 0) {
+        rankingList.innerHTML = '<p class="small">No ranked items yet. Add your chase cards, filler cards, or auction items above.</p>';
+        return;
+      }
+
+      const rankOrder = { S: 1, A: 2, B: 3, C: 4, D: 5 };
+      const sortedItems = [...rankedItems].sort((a, b) => rankOrder[a.rank] - rankOrder[b.rank]);
+
+      sortedItems.forEach((item) => {
+        const card = document.createElement('div');
+        card.className = 'rank-card';
+
+        card.innerHTML = `
+          <div>
+            <div class="rank-title">${escapeHtml(item.name)}</div>
+            <button class="secondary" onclick="removeItem('${item.id}')" style="padding: 7px 11px; font-size: 0.8rem;">Remove</button>
+          </div>
+          <div class="rank-badge rank-${item.rank.toLowerCase()}">${item.rank} Tier</div>
+        `;
+
+        rankingList.appendChild(card);
+      });
+    }
+
+    function addItem() {
+      const name = itemName.value.trim();
+      const rank = itemRank.value;
+
+      if (!name) {
+        alert('Type an item name first.');
+        return;
+      }
+
+      rankedItems.push({
+        id: Date.now().toString(),
+        name,
+        rank
+      });
+
+      itemName.value = '';
+      saveRankings();
+      renderRankings();
+    }
+
+    function removeItem(id) {
+      rankedItems = rankedItems.filter(item => item.id !== id);
+      saveRankings();
+      renderRankings();
+    }
+
+    function clearItems() {
+      if (!confirm('Clear all ranked items?')) return;
+      rankedItems = [];
+      saveRankings();
+      renderRankings();
+    }
+
+    function generateNotes() {
+      const grouped = { S: [], A: [], B: [], C: [], D: [] };
+      rankedItems.forEach(item => grouped[item.rank].push(item.name));
+
+      let notes = `🔥 WHATNOT STREAM NOTES 🔥\n\n`;
+      notes += `PLEASE BE PATIENT WITH ME 🙏\n`;
+      notes += `Every buyer gets their item shown clearly on stream.\n`;
+      notes += `Cards/items may include rookies, patches, autos, numbered cards, parallels, and chase hits.\n\n`;
+      notes += `🎯 RANKED ITEMS:\n\n`;
+
+      Object.keys(grouped).forEach(rank => {
+        if (grouped[rank].length > 0) {
+          notes += `${rank} TIER:\n`;
+          grouped[rank].forEach(name => {
+            notes += `• ${name}\n`;
+          });
+          notes += `\n`;
+        }
+      });
+
+      notes += `✅ Please bookmark the show and follow for more streams.\n`;
+      showNotes.value = notes;
+      localStorage.setItem('showNotes', notes);
+    }
+
+    function copyNotes() {
+      showNotes.select();
+      showNotes.setSelectionRange(0, 99999);
+      navigator.clipboard.writeText(showNotes.value).then(() => {
+        copyStatus.textContent = 'Copied show notes to clipboard.';
+      }).catch(() => {
+        copyStatus.textContent = 'Could not copy automatically. Highlight the text and copy it manually.';
+      });
+    }
+
+    function resetChecklist() {
+      document.querySelectorAll('input[type="checkbox"][data-save]').forEach(box => {
+        box.checked = false;
+        localStorage.setItem(box.dataset.save, 'false');
+        box.nextElementSibling.classList.remove('done');
+      });
+    }
+
+    function escapeHtml(text) {
+      const div = document.createElement('div');
+      div.textContent = text;
+      return div.innerHTML;
+    }
+
+    document.querySelectorAll('input[type="checkbox"][data-save]').forEach(box => {
+      const saved = localStorage.getItem(box.dataset.save) === 'true';
+      box.checked = saved;
+      if (saved) box.nextElementSibling.classList.add('done');
+
+      box.addEventListener('change', () => {
+        localStorage.setItem(box.dataset.save, box.checked);
+        box.nextElementSibling.classList.toggle('done', box.checked);
+      });
+    });
+
+    showNotes.value = localStorage.getItem('showNotes') || '';
+    showNotes.addEventListener('input', () => {
+      localStorage.setItem('showNotes', showNotes.value);
+    });
+
+    itemName.addEventListener('keydown', (event) => {
+      if (event.key === 'Enter') addItem();
+    });
+
+    renderRankings();
+  </script>
+</body>
+</html>
