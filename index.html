@@ -1,0 +1,405 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Stream Checklist Hub</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: Arial, Helvetica, sans-serif; }
+    body { background: #0b111d; color: #fff; min-height: 100vh; padding: 18px; }
+    .container { max-width: 900px; margin: 0 auto; }
+    header { margin-bottom: 16px; }
+    h1 { font-size: clamp(1.8rem, 4vw, 3rem); color: #7defff; margin-bottom: 6px; }
+    .subtitle { color: #b8c7d9; line-height: 1.45; }
+    .tabs { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin: 18px 0; }
+    .tab { border: 1px solid rgba(255,255,255,.15); background: rgba(255,255,255,.08); color: #fff; border-radius: 12px; padding: 12px; font-weight: 800; cursor: pointer; }
+    .tab.active { background: #00d9ff; color: #04111f; }
+    .card { background: rgba(255,255,255,.075); border: 1px solid rgba(255,255,255,.13); border-radius: 18px; padding: 18px; margin-bottom: 14px; }
+    .theme-thommy { border-color: rgba(255,215,0,.35); }
+    .theme-thommy h2, .theme-thommy .accent { color: #ffd76a; }
+    .theme-sports { border-color: rgba(0,217,255,.35); }
+    .theme-sports h2, .theme-sports .accent { color: #7defff; }
+    h2 { font-size: 1.45rem; margin-bottom: 8px; }
+    h3 { font-size: 1rem; margin: 16px 0 8px; border-left: 4px solid currentColor; padding-left: 9px; }
+    .small { color: #b8c7d9; font-size: .9rem; line-height: 1.45; }
+    .row { display: grid; grid-template-columns: 1fr 130px; gap: 8px; margin-top: 10px; }
+    input, select, textarea { width: 100%; border: 1px solid rgba(255,255,255,.18); border-radius: 11px; background: rgba(0,0,0,.28); color: #fff; padding: 11px; outline: none; font-size: .95rem; }
+    select option { background: #111827; color: #fff; }
+    textarea { min-height: 160px; resize: vertical; line-height: 1.45; }
+    button { border: 0; border-radius: 999px; padding: 10px 14px; background: #00d9ff; color: #04111f; font-weight: 800; cursor: pointer; }
+    button.secondary { background: rgba(255,255,255,.11); color: #fff; border: 1px solid rgba(255,255,255,.16); }
+    button.gold { background: #ffd76a; color: #231800; }
+    button.danger { background: rgba(255,80,80,.18); color: #fff; border: 1px solid rgba(255,120,120,.25); padding: 7px 10px; font-size: .78rem; }
+    .buttons { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
+    .hidden { display: none !important; }
+    .item { display: grid; grid-template-columns: auto 1fr auto; gap: 10px; align-items: center; background: rgba(255,255,255,.07); padding: 11px; border-radius: 12px; margin-bottom: 8px; }
+    .item input[type="checkbox"] { width: 19px; height: 19px; accent-color: #00d9ff; }
+    .done { text-decoration: line-through; opacity: .55; }
+    .rank-list { display: grid; gap: 8px; margin-top: 12px; }
+    .rank-card { display: grid; grid-template-columns: 1fr auto auto; gap: 8px; align-items: center; background: rgba(255,255,255,.07); border-radius: 12px; padding: 11px; }
+    .badge { border-radius: 999px; padding: 7px 10px; font-weight: 900; color: #05111f; min-width: 70px; text-align: center; }
+    .rank-s { background: #ffd700; } .rank-a { background: #7dff9b; } .rank-b { background: #7defff; } .rank-c { background: #ffb86b; } .rank-d { background: #ff7d7d; }
+    .lock-box { display: grid; grid-template-columns: 1fr auto; gap: 8px; margin-top: 10px; }
+    .footer { text-align: center; color: #8ea0b8; font-size: .85rem; margin-top: 18px; }
+    @media (max-width: 700px) { body { padding: 12px; } .tabs, .row, .lock-box { grid-template-columns: 1fr; } .rank-card { grid-template-columns: 1fr; } }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1>Stream Checklist Hub</h1>
+      <p class="subtitle">Viewers can open each stream page and check items off on their own device. Creating/editing the list is locked behind a password.</p>
+    </header>
+
+    <div class="tabs">
+      <button class="tab active" onclick="switchStreamer('thommy')">Thommylew</button>
+      <button class="tab" onclick="switchStreamer('dcbreakz')">dcbreakzcardz</button>
+      <button class="tab" onclick="switchStreamer('robbie')">robbiesellscards</button>
+    </div>
+
+    <section id="mainCard" class="card theme-thommy">
+      <h2 id="streamerName">Thommylew</h2>
+      <p id="streamerDesc" class="small">Bullion, silver, gold, coins, rounds, bars, slabs, and lots.</p>
+
+      <div id="lockedArea">
+        <div class="lock-box">
+          <input id="passwordInput" type="password" placeholder="Creator password" />
+          <button id="unlockBtn" class="gold" onclick="unlockCreator()">Unlock Creator</button>
+        </div>
+        <p class="small" id="lockStatus">Password required to add, remove, or generate the list. Viewer mode is open.</p>
+      </div>
+
+      <div id="creatorTools" class="hidden">
+        <h3 class="accent">Add Checklist Item</h3>
+        <div class="row">
+          <input id="checkText" type="text" placeholder="Example: Show weight/purity on stream" />
+          <select id="checkSection"></select>
+        </div>
+        <div class="buttons">
+          <button id="addCheckBtn" onclick="addChecklistItem()">Add Item</button>
+          <button class="secondary" onclick="clearCompletedChecklist()">Clear Completed</button>
+          <button class="secondary" onclick="clearChecklist()">Clear All</button>
+          <button class="secondary" onclick="lockCreator()">Lock Creator</button>
+        </div>
+
+        <h3 class="accent">Add Ranked Item</h3>
+        <div class="row">
+          <input id="itemName" type="text" placeholder="Example: 1 oz Silver Eagle / Morgan Dollar" />
+          <select id="itemRank">
+            <option value="S">S Tier</option>
+            <option value="A">A Tier</option>
+            <option value="B">B Tier</option>
+            <option value="C">C Tier</option>
+            <option value="D">D Tier</option>
+          </select>
+        </div>
+        <div class="buttons">
+          <button id="addRankBtn" onclick="addRankedItem()">Add Ranked Item</button>
+          <button class="secondary" onclick="clearRankings()">Clear Rankings</button>
+        </div>
+      </div>
+    </section>
+
+    <section id="checkCard" class="card theme-thommy">
+      <h2>Viewer Checklist</h2>
+      <p class="small">Click items on/off as you follow the stream.</p>
+      <div id="checklistArea"></div>
+    </section>
+
+    <section id="rankCard" class="card theme-thommy">
+      <h2>Item Rankings</h2>
+      <div id="rankingList" class="rank-list"></div>
+    </section>
+
+    <section id="notesCard" class="card theme-thommy">
+      <h2>Generate Notes</h2>
+      <textarea id="showNotes" placeholder="Generated show notes will appear here. Creator can also type custom notes here."></textarea>
+      <div class="buttons">
+        <button id="generateBtn" onclick="generateNotes()">Generate Notes From Rankings</button>
+        <button class="secondary" onclick="copyNotes()">Copy Notes</button>
+        <button id="clearNotesBtn" class="secondary" onclick="clearNotes()">Clear Notes</button>
+      </div>
+      <p id="copyStatus" class="small"></p>
+    </section>
+
+    <p class="footer">Static GitHub Pages note: this password only hides creator tools on the page. For real secure shared editing, you would need a database/login backend.</p>
+  </div>
+
+  <script>
+    const CREATOR_PASSWORD = 'element';
+
+    const configs = {
+      thommy: {
+        name: 'Thommylew',
+        type: 'bullion',
+        theme: 'theme-thommy',
+        desc: 'Bullion, silver, gold, coins, rounds, bars, slabs, and lots.',
+        checkPlaceholder: 'Example: Show weight/purity on stream',
+        rankPlaceholder: 'Example: 1 oz Silver Eagle / Morgan Dollar / Goldback',
+        sections: ['Before Stream', 'Bullion / Coins', 'Pricing', 'Shipping', 'Other'],
+        intro: '🪙 BULLION & COIN STREAM NOTES 🪙'
+      },
+      dcbreakz: {
+        name: 'dcbreakzcardz',
+        type: 'sports',
+        theme: 'theme-sports',
+        desc: 'Sports card stream for NFL, NBA, MLB, rookies, parallels, autos, patches, slabs, and lots.',
+        checkPlaceholder: 'Example: Add rookie chase cards to notes',
+        rankPlaceholder: 'Example: CJ Stroud RC / Wemby Insert / Judge Parallel',
+        sections: ['Before Stream', 'NFL', 'NBA', 'MLB', 'Shipping', 'Other'],
+        intro: '🏈🏀⚾ SPORTS CARD STREAM NOTES 🏈🏀⚾'
+      },
+      robbie: {
+        name: 'robbiesellscards',
+        type: 'sports',
+        theme: 'theme-sports',
+        desc: 'Sports card stream for NFL, NBA, MLB, rookies, parallels, autos, patches, slabs, and lots.',
+        checkPlaceholder: 'Example: Add teams and chase rookies to notes',
+        rankPlaceholder: 'Example: Drake Maye RC / Wemby / Topps Chrome Rookie',
+        sections: ['Before Stream', 'NFL', 'NBA', 'MLB', 'Shipping', 'Other'],
+        intro: '🏈🏀⚾ SPORTS CARD STREAM NOTES 🏈🏀⚾'
+      }
+    };
+
+    let current = 'thommy';
+    let creatorUnlocked = false;
+    let data = loadData(current);
+
+    const cards = ['mainCard', 'checkCard', 'rankCard', 'notesCard'].map(id => document.getElementById(id));
+    const streamerName = document.getElementById('streamerName');
+    const streamerDesc = document.getElementById('streamerDesc');
+    const passwordInput = document.getElementById('passwordInput');
+    const lockStatus = document.getElementById('lockStatus');
+    const creatorTools = document.getElementById('creatorTools');
+    const checkText = document.getElementById('checkText');
+    const checkSection = document.getElementById('checkSection');
+    const itemName = document.getElementById('itemName');
+    const itemRank = document.getElementById('itemRank');
+    const checklistArea = document.getElementById('checklistArea');
+    const rankingList = document.getElementById('rankingList');
+    const showNotes = document.getElementById('showNotes');
+    const copyStatus = document.getElementById('copyStatus');
+
+    function key(name) { return `streamHub_${current}_${name}`; }
+
+    function loadData(streamer) {
+      return {
+        checklist: JSON.parse(localStorage.getItem(`streamHub_${streamer}_checklist`)) || [],
+        rankings: JSON.parse(localStorage.getItem(`streamHub_${streamer}_rankings`)) || [],
+        notes: localStorage.getItem(`streamHub_${streamer}_notes`) || ''
+      };
+    }
+
+    function saveData() {
+      localStorage.setItem(key('checklist'), JSON.stringify(data.checklist));
+      localStorage.setItem(key('rankings'), JSON.stringify(data.rankings));
+      localStorage.setItem(key('notes'), data.notes || '');
+    }
+
+    function switchStreamer(streamer) {
+      data.notes = showNotes.value;
+      saveData();
+      current = streamer;
+      data = loadData(current);
+      document.querySelectorAll('.tab').forEach(btn => btn.classList.remove('active'));
+      const index = streamer === 'thommy' ? 0 : streamer === 'dcbreakz' ? 1 : 2;
+      document.querySelectorAll('.tab')[index].classList.add('active');
+      renderAll();
+    }
+
+    function renderAll() {
+      const cfg = configs[current];
+      streamerName.textContent = cfg.name;
+      streamerDesc.textContent = cfg.desc;
+      checkText.placeholder = cfg.checkPlaceholder;
+      itemName.placeholder = cfg.rankPlaceholder;
+      checkSection.innerHTML = cfg.sections.map(s => `<option value="${s}">${s}</option>`).join('');
+
+      cards.forEach(card => {
+        card.classList.remove('theme-thommy', 'theme-sports');
+        card.classList.add(cfg.theme);
+      });
+
+      document.getElementById('unlockBtn').className = current === 'thommy' ? 'gold' : '';
+      document.getElementById('addCheckBtn').className = current === 'thommy' ? 'gold' : '';
+      document.getElementById('addRankBtn').className = current === 'thommy' ? 'gold' : '';
+      document.getElementById('generateBtn').className = current === 'thommy' ? 'gold' : '';
+
+      showNotes.value = data.notes;
+      renderChecklist();
+      renderRankings();
+      renderCreatorState();
+    }
+
+    function renderCreatorState() {
+      creatorTools.classList.toggle('hidden', !creatorUnlocked);
+      lockStatus.textContent = creatorUnlocked ? 'Creator mode unlocked.' : 'Password required to add, remove, or generate the list. Viewer mode is open.';
+      showNotes.readOnly = !creatorUnlocked;
+      document.getElementById('generateBtn').disabled = !creatorUnlocked;
+      document.getElementById('clearNotesBtn').disabled = !creatorUnlocked;
+    }
+
+    function unlockCreator() {
+      if (passwordInput.value === CREATOR_PASSWORD) {
+        creatorUnlocked = true;
+        passwordInput.value = '';
+        renderCreatorState();
+      } else {
+        lockStatus.textContent = 'Wrong password.';
+      }
+    }
+
+    function lockCreator() {
+      creatorUnlocked = false;
+      renderCreatorState();
+    }
+
+    function renderChecklist() {
+      checklistArea.innerHTML = '';
+      if (data.checklist.length === 0) {
+        checklistArea.innerHTML = '<p class="small">No checklist items yet.</p>';
+        return;
+      }
+      const sections = [...new Set(data.checklist.map(i => i.section))];
+      sections.forEach(section => {
+        checklistArea.insertAdjacentHTML('beforeend', `<h3 class="accent">${section}</h3>`);
+        data.checklist.filter(i => i.section === section).forEach(item => {
+          checklistArea.insertAdjacentHTML('beforeend', `
+            <div class="item">
+              <input type="checkbox" ${item.done ? 'checked' : ''} onchange="toggleChecklistItem('${item.id}')">
+              <span class="${item.done ? 'done' : ''}">${escapeHtml(item.text)}</span>
+              ${creatorUnlocked ? `<button class="danger" onclick="removeChecklistItem('${item.id}')">Remove</button>` : ''}
+            </div>
+          `);
+        });
+      });
+    }
+
+    function addChecklistItem() {
+      if (!creatorUnlocked) return;
+      const text = checkText.value.trim();
+      if (!text) return alert('Type a checklist item first.');
+      data.checklist.push({ id: Date.now().toString(), text, section: checkSection.value, done: false });
+      checkText.value = '';
+      saveData();
+      renderChecklist();
+    }
+
+    function toggleChecklistItem(id) {
+      data.checklist = data.checklist.map(item => item.id === id ? { ...item, done: !item.done } : item);
+      saveData();
+      renderChecklist();
+    }
+
+    function removeChecklistItem(id) {
+      if (!creatorUnlocked) return;
+      data.checklist = data.checklist.filter(item => item.id !== id);
+      saveData();
+      renderChecklist();
+    }
+
+    function clearCompletedChecklist() {
+      if (!creatorUnlocked) return;
+      data.checklist = data.checklist.filter(item => !item.done);
+      saveData();
+      renderChecklist();
+    }
+
+    function clearChecklist() {
+      if (!creatorUnlocked) return;
+      if (!confirm('Clear the whole checklist?')) return;
+      data.checklist = [];
+      saveData();
+      renderChecklist();
+    }
+
+    function renderRankings() {
+      rankingList.innerHTML = '';
+      if (data.rankings.length === 0) {
+        rankingList.innerHTML = '<p class="small">No ranked items yet.</p>';
+        return;
+      }
+      const order = { S: 1, A: 2, B: 3, C: 4, D: 5 };
+      [...data.rankings].sort((a, b) => order[a.rank] - order[b.rank]).forEach(item => {
+        rankingList.insertAdjacentHTML('beforeend', `
+          <div class="rank-card">
+            <strong>${escapeHtml(item.name)}</strong>
+            <span class="badge rank-${item.rank.toLowerCase()}">${item.rank} Tier</span>
+            ${creatorUnlocked ? `<button class="danger" onclick="removeRankedItem('${item.id}')">Remove</button>` : ''}
+          </div>
+        `);
+      });
+    }
+
+    function addRankedItem() {
+      if (!creatorUnlocked) return;
+      const name = itemName.value.trim();
+      if (!name) return alert('Type an item name first.');
+      data.rankings.push({ id: Date.now().toString(), name, rank: itemRank.value });
+      itemName.value = '';
+      saveData();
+      renderRankings();
+    }
+
+    function removeRankedItem(id) {
+      if (!creatorUnlocked) return;
+      data.rankings = data.rankings.filter(item => item.id !== id);
+      saveData();
+      renderRankings();
+    }
+
+    function clearRankings() {
+      if (!creatorUnlocked) return;
+      if (!confirm('Clear all rankings?')) return;
+      data.rankings = [];
+      saveData();
+      renderRankings();
+    }
+
+    function generateNotes() {
+      if (!creatorUnlocked) return;
+      const cfg = configs[current];
+      const grouped = { S: [], A: [], B: [], C: [], D: [] };
+      data.rankings.forEach(item => grouped[item.rank].push(item.name));
+      let notes = `${cfg.intro}\n\n`;
+      Object.keys(grouped).forEach(rank => {
+        if (grouped[rank].length) {
+          notes += `${rank} TIER:\n`;
+          grouped[rank].forEach(name => notes += `• ${name}\n`);
+          notes += '\n';
+        }
+      });
+      showNotes.value = notes.trim() ? notes : '';
+      data.notes = showNotes.value;
+      saveData();
+      copyStatus.textContent = data.rankings.length ? 'Generated notes from rankings.' : 'Add ranked items first.';
+    }
+
+    function copyNotes() {
+      showNotes.select();
+      showNotes.setSelectionRange(0, 99999);
+      navigator.clipboard.writeText(showNotes.value).then(() => copyStatus.textContent = 'Copied notes.');
+    }
+
+    function clearNotes() {
+      if (!creatorUnlocked) return;
+      showNotes.value = '';
+      data.notes = '';
+      saveData();
+      copyStatus.textContent = 'Notes cleared.';
+    }
+
+    function escapeHtml(text) {
+      const div = document.createElement('div');
+      div.textContent = text;
+      return div.innerHTML;
+    }
+
+    checkText.addEventListener('keydown', e => { if (e.key === 'Enter') addChecklistItem(); });
+    itemName.addEventListener('keydown', e => { if (e.key === 'Enter') addRankedItem(); });
+    showNotes.addEventListener('input', () => { if (creatorUnlocked) { data.notes = showNotes.value; saveData(); } });
+
+    renderAll();
+  </script>
+</body>
+</html>
